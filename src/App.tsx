@@ -1,6 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ReceiptDoc from "./ReceiptDoc";
 type TransactionType = "income" | "expense";
@@ -26,7 +24,6 @@ export default function BudgetTracker() {
   const [amount, setAmount] = useState("");
   const [type, setType] = useState<TransactionType>("income");
   const [filter, setFilter] = useState<TransactionType | "all">("all");
-  const pdfRef = useRef<HTMLDivElement>(null);
 
   // Save to localStorage whenever transactions change
   useEffect(() => {
@@ -161,7 +158,31 @@ export default function BudgetTracker() {
       <div className="transactions">
         <div className="filter-controls">
           <h2>Transactions</h2>
-          handleExportPDF
+          <div>
+            <select
+              value={filter}
+              onChange={(e) =>
+                setFilter(e.target.value as TransactionType | "all")
+              }
+            >
+              <option value="all">All</option>
+              <option value="income">Income</option>
+              <option value="expense">Expenses</option>
+            </select>
+            <PDFDownloadLink
+              document={<ReceiptDoc transactions={transactions} />}
+              fileName="receipt.pdf"
+              className="export-btn"
+              // silence the mismatch
+              children={({ loading }) => (
+                <>{loading ? "Preparing…" : "Print Receipt"}</>
+              )}
+            />
+
+            <button onClick={handleClearAll} className="clear-btn">
+              Clear All
+            </button>
+          </div>
         </div>
 
         {/* PDF Content (hidden from view but captured for PDF) */}
