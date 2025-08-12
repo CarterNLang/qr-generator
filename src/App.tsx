@@ -158,7 +158,9 @@ export default function BudgetTracker() {
       <div className="transactions">
         <div className="filter-controls">
           <h2>Transactions</h2>
-          <div>
+
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            {/* filter */}
             <select
               value={filter}
               onChange={(e) =>
@@ -169,15 +171,18 @@ export default function BudgetTracker() {
               <option value="income">Income</option>
               <option value="expense">Expenses</option>
             </select>
+
+            {/* thermal receipt */}
             <PDFDownloadLink
               document={<ReceiptDoc transactions={transactions} />}
               fileName="receipt.pdf"
-              className="export-btn"
-              // silence the mismatch
-              children={({ loading }) => (
-                <>{loading ? "Preparing…" : "Print Receipt"}</>
+            >
+              {({ loading }) => (
+                <button type="button" disabled={loading}>
+                  {loading ? "Preparing…" : "Print Receipt"}
+                </button>
               )}
-            />
+            </PDFDownloadLink>
 
             <button onClick={handleClearAll} className="clear-btn">
               Clear All
