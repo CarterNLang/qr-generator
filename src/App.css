@@ -1,38 +1,146 @@
-.App {
+.budget-tracker {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.balance h2 {
+  margin-bottom: 5px;
+}
+
+.balance p {
+  font-size: 2rem;
+  margin-top: 0;
+}
+
+.positive {
+  color: #2ecc71;
+}
+
+.negative {
+  color: #e74c3c;
+}
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 20px 0;
+}
+
+.summary div {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.transaction-form {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 5px;
+  margin-bottom: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.form-group {
+  margin-bottom: 15px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.radio-group {
   display: flex;
-  flex-direction: column;
+  gap: 15px;
+}
+
+.radio-group label {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  gap: 5px;
+  font-weight: normal;
+}
+
+button {
+  background: #3498db;
   color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+button:hover {
+  background: #2980b9;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.filter-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transactions ul {
+  list-style: none;
+  padding: 0;
+}
+
+.transactions li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.transactions li.income {
+  border-left: 4px solid #2ecc71;
+}
+
+.transactions li.expense {
+  border-left: 4px solid #e74c3c;
+}
+
+.transactions li div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.transactions li h3 {
+  margin: 0;
+}
+
+.transactions li p {
+  margin: 0;
+  color: #666;
+}
+.clear-btn {
+  background: #e74c3c;
+  margin-left: 10px;
+}
+
+.clear-btn:hover {
+  background: #c0392b;
+}
+
+.filter-controls > div {
+  display: flex;
+  align-items: center;
+}
+
+.filter-controls select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
 }
