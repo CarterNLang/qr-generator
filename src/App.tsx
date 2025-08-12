@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ReceiptDoc from "./ReceiptDoc";
 type TransactionType = "income" | "expense";
