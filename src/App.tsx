@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import ReceiptDoc from "./ReceiptDoc";
 type TransactionType = "income" | "expense";
 
 interface Transaction {
@@ -61,24 +62,6 @@ export default function BudgetTracker() {
       )
     ) {
       setTransactions([]);
-    }
-  };
-
-  const handleExportPDF = async () => {
-    if (!pdfRef.current) return;
-
-    try {
-      const canvas = await html2canvas(pdfRef.current);
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("budget-summary.pdf");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
     }
   };
 
@@ -178,70 +161,10 @@ export default function BudgetTracker() {
       <div className="transactions">
         <div className="filter-controls">
           <h2>Transactions</h2>
-          <div>
-            <select
-              value={filter}
-              onChange={(e) =>
-                setFilter(e.target.value as TransactionType | "all")
-              }
-            >
-              <option value="all">All</option>
-              <option value="income">Income</option>
-              <option value="expense">Expenses</option>
-            </select>
-            <button onClick={handleExportPDF} className="export-btn">
-              Export as PDF
-            </button>
-            <button onClick={handleClearAll} className="clear-btn">
-              Clear All
-            </button>
-          </div>
+          handleExportPDF
         </div>
 
         {/* PDF Content (hidden from view but captured for PDF) */}
-        <div ref={pdfRef} style={{ position: "absolute", left: "-9999px" }}>
-          <h2>Budget Summary</h2>
-          <p>Generated on: {new Date().toLocaleDateString()}</p>
-
-          <div className="pdf-summary">
-            <p>
-              <strong>Total Balance:</strong>
-              <span className={balance >= 0 ? "positive" : "negative"}>
-                ${Math.abs(balance).toFixed(2)}
-              </span>
-            </p>
-            <p>
-              <strong>Total Income:</strong> ${income.toFixed(2)}
-            </p>
-            <p>
-              <strong>Total Expenses:</strong> ${expense.toFixed(2)}
-            </p>
-          </div>
-
-          <h3>Transaction History</h3>
-          <table className="pdf-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Description</th>
-                <th>Type</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((t) => (
-                <tr key={t.id}>
-                  <td>{new Date(t.date).toLocaleDateString()}</td>
-                  <td>{t.description}</td>
-                  <td>{t.type}</td>
-                  <td className={t.type}>
-                    {t.type === "income" ? "+" : "-"}${t.amount.toFixed(2)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
 
         {/* Visible transaction list */}
         {filteredTransactions.length === 0 ? (
