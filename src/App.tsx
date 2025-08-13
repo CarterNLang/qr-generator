@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import ReceiptDoc from "./ReceiptDoc";
+
 type TransactionType = "income" | "expense";
 
 interface Transaction {
@@ -11,28 +12,70 @@ interface Transaction {
   date: string;
 }
 
+interface SavingsGoal {
+  targetAmount: number;
+  targetDate: string;
+}
+
 const STORAGE_KEY = "budgetTrackerData";
+const SAVINGS_KEY = "budgetTrackerSavings";
 
 export default function BudgetTracker() {
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    // Load from localStorage on initial render
     const savedData = localStorage.getItem(STORAGE_KEY);
     return savedData ? JSON.parse(savedData) : [];
+  });
+
+  const [savingsGoal, setSavingsGoal] = useState<SavingsGoal>(() => {
+    const savedSavings = localStorage.getItem(SAVINGS_KEY);
+    return savedSavings
+      ? JSON.parse(savedSavings)
+      : { targetAmount: 0, targetDate: "" };
   });
 
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState<TransactionType>("income");
   const [filter, setFilter] = useState<TransactionType | "all">("all");
+  const [newTargetAmount, setNewTargetAmount] = useState("");
+  const [newTargetDate, setNewTargetDate] = useState("");
 
-  // Save to localStorage whenever transactions change
+  // Calculate balance, income, and expense based on current transactions
+  const balance = transactions.reduce(
+    (total, t) => (t.type === "income" ? total + t.amount : total - t.amount),
+    0
+  );
+
+  const income = transactions
+    .filter((t) => t.type === "income")
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const expense = transactions
+    .filter((t) => t.type === "expense")
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  // Calculate savings progress
+  const savingsProgress =
+    savingsGoal.targetAmount > 0
+      ? Math.min((balance / savingsGoal.targetAmount) * 100, 100)
+      : 0;
+
+  // Calculate days remaining
+  const daysRemaining = savingsGoal.targetDate
+    ? Math.ceil(
+        (new Date(savingsGoal.targetDate).getTime() - Date.now()) /
+          (1000 * 60 * 60 * 24)
+      )
+    : 0;
+
+  // Save to localStorage whenever transactions or savings goal changes
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
-  }, [transactions]);
+    localStorage.setItem(SAVINGS_KEY, JSON.stringify(savingsGoal));
+  }, [transactions, savingsGoal]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!description.trim() || !amount.trim()) return;
 
     const newTransaction: Transaction = {
@@ -46,6 +89,18 @@ export default function BudgetTracker() {
     setTransactions([...transactions, newTransaction]);
     setDescription("");
     setAmount("");
+  };
+
+  const handleSetSavingsGoal = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTargetAmount || !newTargetDate) return;
+
+    setSavingsGoal({
+      targetAmount: +newTargetAmount,
+      targetDate: newTargetDate,
+    });
+    setNewTargetAmount("");
+    setNewTargetDate("");
   };
 
   const handleDelete = (id: string) => {
@@ -66,19 +121,6 @@ export default function BudgetTracker() {
     filter === "all"
       ? transactions
       : transactions.filter((t) => t.type === filter);
-
-  const balance = transactions.reduce(
-    (total, t) => (t.type === "income" ? total + t.amount : total - t.amount),
-    0
-  );
-
-  const income = transactions
-    .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const expense = transactions
-    .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
 
   return (
     <div className="budget-tracker">
@@ -102,9 +144,76 @@ export default function BudgetTracker() {
         </div>
       </div>
 
+      {/* Savings Goal Section */}
+      <div className="savings-goal">
+        <h2>Savings Goal</h2>
+        {savingsGoal.targetAmount > 0 && savingsGoal.targetDate ? (
+          <div className="progress-container">
+            <div
+              className="progress-bar"
+              style={{ width: `${savingsProgress}%` }}
+              role="progressbar"
+              aria-valuenow={savingsProgress}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            ></div>
+            <p>
+              ${balance.toFixed(2)} of ${savingsGoal.targetAmount.toFixed(2)}{" "}
+              saved ({savingsProgress.toFixed(0)}%)
+            </p>
+            <p>
+              Target date:{" "}
+              {new Date(savingsGoal.targetDate).toLocaleDateString()}(
+              {daysRemaining > 0
+                ? `${daysRemaining} days remaining`
+                : "Target date reached"}
+              )
+            </p>
+            {balance >= savingsGoal.targetAmount && (
+              <p className="positive">
+                Congratulations! You've reached your savings goal!
+              </p>
+            )}
+          </div>
+        ) : (
+          <p>No savings goal set</p>
+        )}
+
+        <form onSubmit={handleSetSavingsGoal} className="savings-form">
+          <div className="form-group">
+            <label htmlFor="targetAmount">Target Amount</label>
+            <input
+              type="number"
+              id="targetAmount"
+              value={newTargetAmount}
+              onChange={(e) => setNewTargetAmount(e.target.value)}
+              placeholder="Enter target amount..."
+              min="0.01"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="targetDate">Target Date</label>
+            <input
+              type="date"
+              id="targetDate"
+              value={newTargetDate}
+              onChange={(e) => setNewTargetDate(e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+              required
+            />
+          </div>
+
+          <button type="submit">
+            {savingsGoal.targetAmount > 0 ? "Update Goal" : "Set Goal"}
+          </button>
+        </form>
+      </div>
+
       <form onSubmit={handleSubmit} className="transaction-form">
         <h2>Add Transaction</h2>
-
         <div className="form-group">
           <label htmlFor="description">Description</label>
           <input
@@ -158,9 +267,7 @@ export default function BudgetTracker() {
       <div className="transactions">
         <div className="filter-controls">
           <h2>Transactions</h2>
-
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            {/* filter */}
             <select
               value={filter}
               onChange={(e) =>
@@ -172,7 +279,6 @@ export default function BudgetTracker() {
               <option value="expense">Expenses</option>
             </select>
 
-            {/* thermal receipt */}
             <PDFDownloadLink
               document={<ReceiptDoc transactions={transactions} />}
               fileName="receipt.pdf"
@@ -190,9 +296,6 @@ export default function BudgetTracker() {
           </div>
         </div>
 
-        {/* PDF Content (hidden from view but captured for PDF) */}
-
-        {/* Visible transaction list */}
         {filteredTransactions.length === 0 ? (
           <p>No transactions found</p>
         ) : (

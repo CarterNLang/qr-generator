@@ -144,3 +144,97 @@ button:hover {
   border-radius: 4px;
   border: 1px solid #ddd;
 }
+.savings-goal {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* Savings Goal Styles */
+.savings-goal {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.savings-progress {
+  margin-bottom: 1rem;
+}
+
+.progress-container {
+  width: 100%;
+  height: 20px !important; /* Force height */
+  min-height: 20px !important; /* Double protection */
+  background-color: #e9ecef;
+  border-radius: 10px;
+  margin: 1rem 0;
+  overflow: hidden;
+  position: relative;
+  display: flex; /* New approach using flex */
+}
+
+.progress-bar {
+  height: 100% !important;
+  min-height: 20px !important;
+  background-color: #4caf50;
+  transition: width 0.5s ease;
+  border-radius: 10px;
+  display: block;
+}
+
+.savings-stats {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+  color: #333;
+}
+
+.target-date {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0.5rem 0;
+}
+
+.success-message {
+  color: #4caf50;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}
+
+.savings-form {
+  margin-top: 1.5rem;
+}
+
+.savings-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.savings-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.savings-form input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.savings-form button {
+  background-color: #4caf50;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.savings-form button:hover {
+  background-color: #45a049;
+}
